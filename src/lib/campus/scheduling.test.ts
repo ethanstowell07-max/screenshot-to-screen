@@ -57,14 +57,23 @@ describe("booking", () => {
   });
 
   it("blocks slots that clash with the student's own sessions", () => {
-    // Maya has CS 110 with Jordan next Wednesday 3 PM; Marcus is free Wed 4–6 PM, not 3 PM
-    const s = seed();
-    const res = bookSession(
-      s,
-      { tutorId: "t-marcus", studentId: "s-maya", courseCode: "MATH 151", date: nextWeekday(NOW, 3), start: h(16), format: "in-person", note: "" },
+    // Jordan (Sat 10–12) and Amara (Sat 11–1) overlap at 11 AM
+    const sat = nextWeekday(NOW, 6);
+    const first = bookSession(
+      seed(),
+      { tutorId: "t-jordan", studentId: "s-maya", courseCode: "CS 110", date: sat, start: h(11), format: "in-person", note: "" },
       NOW,
     );
-    expect(res.ok).toBe(true);
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    const second = bookSession(
+      first.state,
+      { tutorId: "t-amara", studentId: "s-maya", courseCode: "ECON 101", date: sat, start: h(11), format: "in-person", note: "" },
+      NOW,
+    );
+    expect(second.ok).toBe(false);
+    const slots = slotsForDate(first.state, "t-amara", sat, NOW, { studentId: "s-maya" });
+    expect(slots.find((x) => x.start === h(11))?.state).toBe("conflict");
   });
 });
 
