@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppointmentsRouteImport } from './routes/appointments'
+import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as BookTutorIdRouteImport } from './routes/book.$tutorId'
+import { Route as BookingAppointmentIdRouteImport } from './routes/booking.$appointmentId'
 import { Route as TutorsIndexRouteImport } from './routes/tutors.index'
 import { Route as TutorsTutorIdRouteImport } from './routes/tutors.$tutorId'
 
@@ -19,9 +23,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppointmentsRoute = AppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookTutorIdRoute = BookTutorIdRouteImport.update({
   id: '/book/$tutorId',
   path: '/book/$tutorId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingAppointmentIdRoute = BookingAppointmentIdRouteImport.update({
+  id: '/booking/$appointmentId',
+  path: '/booking/$appointmentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TutorsIndexRoute = TutorsIndexRouteImport.update({
@@ -37,34 +61,75 @@ const TutorsTutorIdRoute = TutorsTutorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/appointments': typeof AppointmentsRoute
+  '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/book/$tutorId': typeof BookTutorIdRoute
+  '/booking/$appointmentId': typeof BookingAppointmentIdRoute
   '/tutors/$tutorId': typeof TutorsTutorIdRoute
   '/tutors/': typeof TutorsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/appointments': typeof AppointmentsRoute
+  '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/book/$tutorId': typeof BookTutorIdRoute
+  '/booking/$appointmentId': typeof BookingAppointmentIdRoute
   '/tutors/$tutorId': typeof TutorsTutorIdRoute
   '/tutors': typeof TutorsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/appointments': typeof AppointmentsRoute
+  '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/book/$tutorId': typeof BookTutorIdRoute
+  '/booking/$appointmentId': typeof BookingAppointmentIdRoute
   '/tutors/$tutorId': typeof TutorsTutorIdRoute
   '/tutors/': typeof TutorsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/book/$tutorId' | '/tutors/$tutorId' | '/tutors/'
+  fullPaths:
+    | '/'
+    | '/appointments'
+    | '/messages'
+    | '/notifications'
+    | '/book/$tutorId'
+    | '/booking/$appointmentId'
+    | '/tutors/$tutorId'
+    | '/tutors/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/book/$tutorId' | '/tutors/$tutorId' | '/tutors'
-  id: '__root__' | '/' | '/book/$tutorId' | '/tutors/$tutorId' | '/tutors/'
+  to:
+    | '/'
+    | '/appointments'
+    | '/messages'
+    | '/notifications'
+    | '/book/$tutorId'
+    | '/booking/$appointmentId'
+    | '/tutors/$tutorId'
+    | '/tutors'
+  id:
+    | '__root__'
+    | '/'
+    | '/appointments'
+    | '/messages'
+    | '/notifications'
+    | '/book/$tutorId'
+    | '/booking/$appointmentId'
+    | '/tutors/$tutorId'
+    | '/tutors/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppointmentsRoute: typeof AppointmentsRoute
+  MessagesRoute: typeof MessagesRoute
+  NotificationsRoute: typeof NotificationsRoute
   BookTutorIdRoute: typeof BookTutorIdRoute
+  BookingAppointmentIdRoute: typeof BookingAppointmentIdRoute
   TutorsTutorIdRoute: typeof TutorsTutorIdRoute
   TutorsIndexRoute: typeof TutorsIndexRoute
 }
@@ -78,11 +143,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/appointments': {
+      id: '/appointments'
+      path: '/appointments'
+      fullPath: '/appointments'
+      preLoaderRoute: typeof AppointmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/book/$tutorId': {
       id: '/book/$tutorId'
       path: '/book/$tutorId'
       fullPath: '/book/$tutorId'
       preLoaderRoute: typeof BookTutorIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking/$appointmentId': {
+      id: '/booking/$appointmentId'
+      path: '/booking/$appointmentId'
+      fullPath: '/booking/$appointmentId'
+      preLoaderRoute: typeof BookingAppointmentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tutors/': {
@@ -104,7 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppointmentsRoute: AppointmentsRoute,
+  MessagesRoute: MessagesRoute,
+  NotificationsRoute: NotificationsRoute,
   BookTutorIdRoute: BookTutorIdRoute,
+  BookingAppointmentIdRoute: BookingAppointmentIdRoute,
   TutorsTutorIdRoute: TutorsTutorIdRoute,
   TutorsIndexRoute: TutorsIndexRoute,
 }
