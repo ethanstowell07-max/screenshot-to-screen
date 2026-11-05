@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, CalendarX, MapPin, UserX, Video } from "lucide-react";
 import { toast } from "sonner";
@@ -350,7 +350,7 @@ function BookSession() {
   );
 }
 
-function StepTitle({ n, children, optional }: { n: number; children: React.ReactNode; optional?: boolean }) {
+function StepTitle({ n, children, optional }: { n: number; children: ReactNode; optional?: boolean }) {
   return (
     <h2 className="mb-4 flex items-center gap-3 font-sans text-base font-bold">
       <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-xs text-primary">
@@ -362,7 +362,7 @@ function StepTitle({ n, children, optional }: { n: number; children: React.React
   );
 }
 
-function FieldError({ children }: { children: React.ReactNode }) {
+function FieldError({ children }: { children: ReactNode }) {
   return (
     <p role="alert" className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-destructive">
       <AlertCircle className="h-4 w-4" />

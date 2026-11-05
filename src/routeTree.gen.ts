@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BookTutorIdRouteImport } from './routes/book.$tutorId'
 import { Route as TutorsIndexRouteImport } from './routes/tutors.index'
 import { Route as TutorsTutorIdRouteImport } from './routes/tutors.$tutorId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookTutorIdRoute = BookTutorIdRouteImport.update({
+  id: '/book/$tutorId',
+  path: '/book/$tutorId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TutorsIndexRoute = TutorsIndexRouteImport.update({
@@ -31,30 +37,34 @@ const TutorsTutorIdRoute = TutorsTutorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/book/$tutorId': typeof BookTutorIdRoute
   '/tutors/$tutorId': typeof TutorsTutorIdRoute
   '/tutors/': typeof TutorsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/book/$tutorId': typeof BookTutorIdRoute
   '/tutors/$tutorId': typeof TutorsTutorIdRoute
   '/tutors': typeof TutorsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/book/$tutorId': typeof BookTutorIdRoute
   '/tutors/$tutorId': typeof TutorsTutorIdRoute
   '/tutors/': typeof TutorsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tutors/$tutorId' | '/tutors/'
+  fullPaths: '/' | '/book/$tutorId' | '/tutors/$tutorId' | '/tutors/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tutors/$tutorId' | '/tutors'
-  id: '__root__' | '/' | '/tutors/$tutorId' | '/tutors/'
+  to: '/' | '/book/$tutorId' | '/tutors/$tutorId' | '/tutors'
+  id: '__root__' | '/' | '/book/$tutorId' | '/tutors/$tutorId' | '/tutors/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookTutorIdRoute: typeof BookTutorIdRoute
   TutorsTutorIdRoute: typeof TutorsTutorIdRoute
   TutorsIndexRoute: typeof TutorsIndexRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book/$tutorId': {
+      id: '/book/$tutorId'
+      path: '/book/$tutorId'
+      fullPath: '/book/$tutorId'
+      preLoaderRoute: typeof BookTutorIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tutors/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookTutorIdRoute: BookTutorIdRoute,
   TutorsTutorIdRoute: TutorsTutorIdRoute,
   TutorsIndexRoute: TutorsIndexRoute,
 }
