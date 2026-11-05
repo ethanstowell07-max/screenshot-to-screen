@@ -1,0 +1,332 @@
+import type {
+  Appointment,
+  AvailabilityWindow,
+  CampusNotification,
+  CampusState,
+  Course,
+  Message,
+  Student,
+  Tutor,
+  Weekday,
+} from "./types";
+import { nextWeekday, previousWeekday } from "./time";
+
+export const STATE_VERSION = 1;
+
+export const COURSES: Course[] = [
+  { code: "MATH 151", name: "Calculus I", subject: "Mathematics" },
+  { code: "MATH 221", name: "Linear Algebra", subject: "Mathematics" },
+  { code: "STAT 200", name: "Introduction to Statistics", subject: "Statistics" },
+  { code: "CS 110", name: "Intro to Programming (Python)", subject: "Computer Science" },
+  { code: "CS 220", name: "Data Structures", subject: "Computer Science" },
+  { code: "CHEM 101", name: "General Chemistry", subject: "Chemistry" },
+  { code: "CHEM 231", name: "Organic Chemistry I", subject: "Chemistry" },
+  { code: "BIO 150", name: "Cell & Molecular Biology", subject: "Biology" },
+  { code: "PHYS 201", name: "Physics I: Mechanics", subject: "Physics" },
+  { code: "ECON 101", name: "Principles of Microeconomics", subject: "Economics" },
+  { code: "ENG 105", name: "Academic Writing", subject: "Writing" },
+  { code: "PSYC 100", name: "Introduction to Psychology", subject: "Psychology" },
+];
+
+const TUTORS: Tutor[] = [
+  {
+    id: "t-jordan",
+    name: "Jordan Lee",
+    major: "Computer Science",
+    year: "Junior",
+    courses: ["CS 110", "CS 220", "MATH 221"],
+    bio: "I break problems into small steps and love helping first-time coders get past the blank-editor feeling. Bring your lab or a bug you're stuck on.",
+    rating: 4.9,
+    sessionsLed: 86,
+    location: "Hartwell Library, Room 2B",
+    formats: ["in-person", "virtual"],
+  },
+  {
+    id: "t-priya",
+    name: "Priya Raman",
+    major: "Biochemistry",
+    year: "Senior",
+    courses: ["CHEM 101", "CHEM 231", "BIO 150"],
+    bio: "Pre-med senior and former orgo struggler. I teach mechanisms with color-coded sketches and plenty of practice problems.",
+    rating: 4.8,
+    sessionsLed: 124,
+    location: "Science Commons, Table 4",
+    formats: ["in-person", "virtual"],
+  },
+  {
+    id: "t-marcus",
+    name: "Marcus Okafor",
+    major: "Applied Mathematics",
+    year: "Senior",
+    courses: ["MATH 151", "MATH 221", "STAT 200"],
+    bio: "Patient with proofs and big on intuition first. We'll work through your problem sets together until the 'why' clicks.",
+    rating: 4.9,
+    sessionsLed: 140,
+    location: "Math Learning Center, Hall B",
+    formats: ["in-person"],
+  },
+  {
+    id: "t-sofia",
+    name: "Sofia Alvarez",
+    major: "English & Psychology",
+    year: "Sophomore",
+    courses: ["ENG 105", "PSYC 100"],
+    bio: "Writing Center fellow. I help with thesis statements, structure and citations — and can quiz you for psych exams.",
+    rating: 4.7,
+    sessionsLed: 52,
+    location: "Writing Center, Moore Hall 110",
+    formats: ["in-person", "virtual"],
+  },
+  {
+    id: "t-daniel",
+    name: "Daniel Kim",
+    major: "Physics",
+    year: "Junior",
+    courses: ["PHYS 201", "MATH 151"],
+    bio: "Free-body diagrams are my favorite thing. I focus on setting problems up correctly so the math takes care of itself.",
+    rating: 4.6,
+    sessionsLed: 41,
+    location: "Physics Lounge, Keller 3rd floor",
+    formats: ["virtual"],
+  },
+  {
+    id: "t-amara",
+    name: "Amara Johnson",
+    major: "Economics",
+    year: "Senior",
+    courses: ["ECON 101", "STAT 200"],
+    bio: "Graphs, elasticity and exam strategy. I use real-world examples so supply and demand actually make sense.",
+    rating: 4.8,
+    sessionsLed: 77,
+    location: "Business School Atrium",
+    formats: ["in-person", "virtual"],
+  },
+  {
+    id: "t-ethan",
+    name: "Ethan Brooks",
+    major: "Biology",
+    year: "Junior",
+    courses: ["BIO 150", "CHEM 101"],
+    bio: "Lab TA for intro bio. Currently on a short break while I finish my research poster — check back soon!",
+    rating: 4.7,
+    sessionsLed: 33,
+    location: "Life Sciences 204",
+    formats: ["in-person"],
+  },
+];
+
+const STUDENTS: Student[] = [
+  {
+    id: "s-maya",
+    name: "Maya Patel",
+    major: "Biology (Pre-med)",
+    year: "Sophomore",
+    email: "maya.patel@campus.edu",
+    preferredFormat: "in-person",
+  },
+  {
+    id: "s-liam",
+    name: "Liam Chen",
+    major: "Mechanical Engineering",
+    year: "Freshman",
+    email: "liam.chen@campus.edu",
+    preferredFormat: "in-person",
+  },
+  {
+    id: "s-ava",
+    name: "Ava Thompson",
+    major: "Data Science",
+    year: "Sophomore",
+    email: "ava.thompson@campus.edu",
+    preferredFormat: "virtual",
+  },
+  {
+    id: "s-noah",
+    name: "Noah Williams",
+    major: "Undeclared",
+    year: "Freshman",
+    email: "noah.williams@campus.edu",
+    preferredFormat: "in-person",
+  },
+  {
+    id: "s-zoe",
+    name: "Zoe Martinez",
+    major: "Information Science",
+    year: "Junior",
+    email: "zoe.martinez@campus.edu",
+    preferredFormat: "virtual",
+  },
+];
+
+const h = (hours: number, minutes = 0) => hours * 60 + minutes;
+
+const WINDOWS: [string, Weekday, number, number][] = [
+  ["t-jordan", 1, h(14), h(17)],
+  ["t-jordan", 3, h(14), h(17)],
+  ["t-jordan", 4, h(18), h(20)],
+  ["t-jordan", 6, h(10), h(12)],
+  ["t-priya", 2, h(10), h(13)],
+  ["t-priya", 4, h(13), h(16)],
+  ["t-priya", 5, h(9), h(11)],
+  ["t-marcus", 1, h(10), h(12)],
+  ["t-marcus", 3, h(10), h(12)],
+  ["t-marcus", 3, h(16), h(18)],
+  ["t-marcus", 5, h(13), h(15)],
+  ["t-sofia", 2, h(15), h(18)],
+  ["t-sofia", 4, h(10), h(12)],
+  ["t-sofia", 0, h(13), h(15)],
+  ["t-daniel", 1, h(19), h(21)],
+  ["t-daniel", 3, h(19), h(21)],
+  ["t-amara", 2, h(13), h(15)],
+  ["t-amara", 4, h(16), h(18)],
+  ["t-amara", 6, h(11), h(13)],
+];
+
+export function createSeedState(now: Date): CampusState {
+  const availability: AvailabilityWindow[] = WINDOWS.map(([tutorId, weekday, start, end], i) => ({
+    id: `w-${i + 1}`,
+    tutorId,
+    weekday,
+    start,
+    end,
+  }));
+
+  const created = (daysAgo: number) =>
+    new Date(now.getTime() - daysAgo * 86_400_000 - 3_600_000).toISOString();
+
+  const appt = (
+    id: string,
+    studentId: string,
+    tutorId: string,
+    courseCode: string,
+    date: string,
+    start: number,
+    status: Appointment["status"],
+    format: Appointment["format"],
+    note: string,
+    createdDaysAgo = 2,
+  ): Appointment => ({
+    id,
+    studentId,
+    tutorId,
+    courseCode,
+    date,
+    start,
+    end: start + 60,
+    status,
+    format,
+    note,
+    createdAt: created(createdDaysAgo),
+    rescheduledCount: 0,
+  });
+
+  const appointments: Appointment[] = [
+    // Maya (the demo student)
+    appt("a-1", "s-maya", "t-priya", "CHEM 231", nextWeekday(now, 2), h(11), "confirmed", "virtual", "Review SN1 vs SN2 mechanisms before the quiz."),
+    appt("a-2", "s-maya", "t-marcus", "STAT 200", nextWeekday(now, 5), h(13), "pending", "in-person", "Hypothesis testing homework, problems 4–9.", 1),
+    appt("a-3", "s-maya", "t-jordan", "CS 110", nextWeekday(now, 3), h(15), "confirmed", "in-person", "Loops and functions — lab 5."),
+    appt("a-4", "s-maya", "t-priya", "CHEM 101", previousWeekday(now, 4), h(14), "confirmed", "in-person", "Stoichiometry practice.", 10),
+    appt("a-5", "s-maya", "t-sofia", "ENG 105", previousWeekday(now, 2), h(15), "cancelled", "virtual", "Thesis feedback for essay 2.", 12),
+    // Jordan (the demo tutor) with other students
+    appt("a-6", "s-liam", "t-jordan", "CS 220", nextWeekday(now, 1), h(14), "pending", "in-person", "Linked lists and recursion — midterm prep.", 0),
+    appt("a-7", "s-ava", "t-jordan", "MATH 221", nextWeekday(now, 4), h(18), "pending", "virtual", "Eigenvalues; I keep mixing up the steps.", 0),
+    appt("a-8", "s-noah", "t-jordan", "CS 110", nextWeekday(now, 1), h(16), "confirmed", "in-person", "First programming class ever, need help with setup."),
+    appt("a-9", "s-zoe", "t-jordan", "CS 220", previousWeekday(now, 3), h(14), "confirmed", "virtual", "Big-O review.", 9),
+  ];
+
+  const notifications: CampusNotification[] = [
+    {
+      id: "n-1",
+      role: "student",
+      recipientId: "s-maya",
+      kind: "confirmed",
+      title: "Session confirmed",
+      body: "Priya Raman confirmed your CHEM 231 session.",
+      appointmentId: "a-1",
+      createdAt: created(1),
+      read: false,
+    },
+    {
+      id: "n-2",
+      role: "student",
+      recipientId: "s-maya",
+      kind: "confirmed",
+      title: "Session confirmed",
+      body: "Jordan Lee confirmed your CS 110 session.",
+      appointmentId: "a-3",
+      createdAt: created(2),
+      read: true,
+    },
+    {
+      id: "n-3",
+      role: "tutor",
+      recipientId: "t-jordan",
+      kind: "request",
+      title: "New session request",
+      body: "Liam Chen requested a CS 220 session.",
+      appointmentId: "a-6",
+      createdAt: created(0),
+      read: false,
+    },
+    {
+      id: "n-4",
+      role: "tutor",
+      recipientId: "t-jordan",
+      kind: "request",
+      title: "New session request",
+      body: "Ava Thompson requested a MATH 221 session.",
+      appointmentId: "a-7",
+      createdAt: created(0),
+      read: false,
+    },
+  ];
+
+  const messages: Message[] = [
+    {
+      id: "m-1",
+      studentId: "s-maya",
+      tutorId: "t-priya",
+      from: "student",
+      body: "Hi Priya! Could we spend some time on carbocation stability on Tuesday?",
+      createdAt: created(1),
+    },
+    {
+      id: "m-2",
+      studentId: "s-maya",
+      tutorId: "t-priya",
+      from: "tutor",
+      body: "Absolutely — bring the practice set from chapter 7 and we'll go through it together.",
+      createdAt: created(0.9),
+    },
+    {
+      id: "m-3",
+      studentId: "s-maya",
+      tutorId: "t-jordan",
+      from: "tutor",
+      body: "Hey Maya, see you Wednesday. If you can, push your lab code to GitHub so we can look at it together.",
+      createdAt: created(2),
+    },
+    {
+      id: "m-4",
+      studentId: "s-liam",
+      tutorId: "t-jordan",
+      from: "student",
+      body: "Thanks for tutoring! I sent a request for Monday — hope that works.",
+      createdAt: created(0),
+    },
+  ];
+
+  return {
+    version: STATE_VERSION,
+    role: "student",
+    currentStudentId: "s-maya",
+    currentTutorId: "t-jordan",
+    courses: COURSES,
+    tutors: TUTORS,
+    students: STUDENTS,
+    availability,
+    appointments,
+    notifications,
+    messages,
+  };
+}
