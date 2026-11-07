@@ -5,6 +5,7 @@ Implement exactly the screenshot and nothing else
 This project was built with [Lovable](https://lovable.dev).
 
 https://id-preview--ca87be04-fb3f-463f-9850-5147121dc686.lovable.app/
+https://pixel-perfect-scene-5703.lovable.app
 
 ## Build with Lovable
 
